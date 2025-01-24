@@ -1,0 +1,165 @@
+*&---------------------------------------------------------------------*
+*& Report  ZHIERARCHICAL_ALV
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+REPORT  ZHIERARCHICAL_ALV.
+
+TYPES : BEGIN OF TS_VBAK,
+      VBELN type VBELN_VA,
+      ERDAT TYPE ERDAT,
+      ERZET TYPE ERZET,
+      ERNAM TYPE ERNAM,
+  END OF TS_VBAK.
+
+
+DATA : IT_VBAK TYPE TABLE OF TS_VBAK.
+DATA : LV_VBELN TYPE VBELN_VA.
+
+
+* DECLARE FIELDCATLOG INTERNAL TABLE
+DATA : IT_FIELDCAT TYPE SLIS_T_FIELDCAT_ALV,
+      LS_FIELDCAT TYPE SLIS_FIELDCAT_ALV.   "WORKAREA OF TYPE STRUCTURE
+
+DATA : LS_KEYINFO TYPE SLIS_KEYINFO_ALV.
+
+TYPES : BEGIN OF TS_VBAP,
+      VBELN type VBELN_VA,
+      POSNR TYPE POSNR_VA,
+      MATNR TYPE MATNR,
+  END OF TS_VBAP.
+
+DATA : IT_VBAP TYPE TABLE OF TS_VBAP.
+SELECT-OPTIONS : S_VBELN FOR LV_VBELN.
+
+*FETCH DATA FROM HEADER DATA
+SELECT VBELN VBELN VBELN  ERNAM
+  FROM VBAK
+  INTO TABLE IT_VBAK
+  WHERE VBELN IN S_VBELN.
+
+IF IT_VBAK IS NOT INITIAL.
+  SELECT VBELN POSNR MATNR
+  FROM VBAP
+  INTO TABLE IT_VBAP
+  FOR ALL ENTRIES IN IT_VBAK
+  WHERE VBELN  = IT_VBAK-VBELN.    "1st internal table vbeln act as a input the VBELN OF VBAP
+ENDIF.
+
+* SLIS_T_FIELDCAT_ALV  => STANDARD TABLE TYPE TO GENERATE A FIELDCATALOG
+
+*MANUALLY CREATING FIELDCATLOG
+
+LS_FIELDCAT-col_pos = '1'.
+LS_FIELDCAT-fieldname = 'VBELN'.
+LS_FIELDCAT-tabname = 'IT_VBAK'.
+LS_FIELDCAT-seltext_l = 'SALES DOCUMENT NUMBER'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+LS_FIELDCAT-col_pos = '2'.
+LS_FIELDCAT-fieldname = 'ERDAT'.
+LS_FIELDCAT-tabname = 'IT_VBAK'.
+LS_FIELDCAT-seltext_l = 'CREATION DATE'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+LS_FIELDCAT-col_pos = '3'.
+LS_FIELDCAT-fieldname = 'ERZET'.
+LS_FIELDCAT-tabname = 'IT_VBAK'.
+LS_FIELDCAT-seltext_l = 'TIME'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+LS_FIELDCAT-col_pos = '4'.
+LS_FIELDCAT-fieldname = 'ERNAM'.
+LS_FIELDCAT-tabname = 'IT_VBAK'.
+LS_FIELDCAT-seltext_l = 'USER'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+*FIELDS OF VBAP
+
+LS_FIELDCAT-col_pos = '1'.
+LS_FIELDCAT-fieldname = 'VBELN'.
+LS_FIELDCAT-tabname = 'IT_VBAP'.
+LS_FIELDCAT-seltext_l = 'SALES DOCUMENT NUMBER'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+LS_FIELDCAT-col_pos = '2'.
+LS_FIELDCAT-fieldname = 'POSNR'.
+LS_FIELDCAT-tabname = 'IT_VBAP'.
+LS_FIELDCAT-seltext_l = 'ITEM NUMBER'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+
+LS_FIELDCAT-col_pos = '3'.
+LS_FIELDCAT-fieldname = 'MATNR'.
+LS_FIELDCAT-tabname = 'IT_VBAP'.
+LS_FIELDCAT-seltext_l = 'MATERIAL NUMBER'.
+APPEND LS_FIELDCAT TO IT_FIELDCAT.
+
+CLEAR LS_FIELDCAT.
+
+LS_KEYINFO-HEADER01 = 'VBELN'.
+LS_KEYINFO-ITEM01 = 'VBELN'.
+
+
+CALL FUNCTION 'REUSE_ALV_HIERSEQ_LIST_DISPLAY'
+  EXPORTING
+*   I_INTERFACE_CHECK              = ' '
+*   I_CALLBACK_PROGRAM             =
+*   I_CALLBACK_PF_STATUS_SET       = ' '
+*   I_CALLBACK_USER_COMMAND        = ' '
+*   IS_LAYOUT                      =
+   IT_FIELDCAT                    = IT_FIELDCAT
+*   IT_EXCLUDING                   =
+*   IT_SPECIAL_GROUPS              =
+*   IT_SORT                        =
+*   IT_FILTER                      =
+*   IS_SEL_HIDE                    =
+*   I_SCREEN_START_COLUMN          = 0
+*   I_SCREEN_START_LINE            = 0
+*   I_SCREEN_END_COLUMN            = 0
+*   I_SCREEN_END_LINE              = 0
+*   I_DEFAULT                      = 'X'
+*   I_SAVE                         = ' '
+*   IS_VARIANT                     =
+*   IT_EVENTS                      =
+*   IT_EVENT_EXIT                  =
+    I_TABNAME_HEADER               = 'IT_VBAK'
+    I_TABNAME_ITEM                 = 'IT_VBAP'
+*   I_STRUCTURE_NAME_HEADER        =
+*   I_STRUCTURE_NAME_ITEM          =
+    IS_KEYINFO                     = LS_KEYINFO
+*   IS_PRINT                       =
+*   IS_REPREP_ID                   =
+*   I_BYPASSING_BUFFER             =
+*   I_BUFFER_ACTIVE                =
+*   IR_SALV_HIERSEQ_ADAPTER        =
+*   IT_EXCEPT_QINFO                =
+*   I_SUPPRESS_EMPTY_DATA          = ABAP_FALSE
+* IMPORTING
+*   E_EXIT_CAUSED_BY_CALLER        =
+*   ES_EXIT_CAUSED_BY_USER         =
+  TABLES
+    T_OUTTAB_HEADER                = IT_VBAK
+    T_OUTTAB_ITEM                  = IT_VBAP
+* EXCEPTIONS
+*   PROGRAM_ERROR                  = 1
+*   OTHERS                         = 2
+          .
+IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+ENDIF.
