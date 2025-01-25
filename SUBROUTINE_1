@@ -1,0 +1,24 @@
+*&---------------------------------------------------------------------*
+*& Report  ZSUBROUTINE01
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+REPORT  ZSUBROUTINE01.
+
+
+data : V_X TYPE I VALUE 20,
+      V_Y TYPE I VALUE 10.
+
+
+PERFORM SUB1 USING V_X V_Y. "ACTUAL PARAMETER
+
+
+
+FORM SUB1 USING K1 K2. "FORMAL PARAMETER
+  DATA LV_Z TYPE I.
+  LV_Z = K1 + K2.
+  WRITE : /'SUM IS: ',LV_Z.
+ENDFORM.
