@@ -1,0 +1,58 @@
+*&---------------------------------------------------------------------*
+*& Report  ZINTERACTIVE_REPORT30
+*&
+*&---------------------------------------------------------------------*
+*&
+*&
+*&---------------------------------------------------------------------*
+
+REPORT  ZINTERACTIVE_REPORT30.
+
+TYPES : BEGIN OF TS_ORDH,
+        ONO TYPE ZDEONO_28,
+        ODATE TYPE ZDEODATE_28,
+        TA TYPE ZDETA_28,
+  END OF TS_ORDH.
+
+DATA : IT_ORDH TYPE TABLE OF TS_ORDH,
+      WA_ORDH TYPE TS_ORDH.
+
+DATA LV_ONO TYPE ZDEONO_28.
+SELECT-OPTIONS : S_ONO FOR LV_ONO.
+
+START-OF-SELECTION.
+
+SELECT ONO ODATE TA
+  FROM ZORDH_28
+  INTO TABLE IT_ORDH
+  WHERE ONO IN S_ONO.
+
+LOOP AT IT_ORDH INTO WA_ORDH.
+  WRITE :/ WA_ORDH-ONO,WA_ORDH-ODATE,WA_ORDH-TA.
+ENDLOOP.
+
+*ORDER ITEM TABLE
+
+TYPES : BEGIN OF TS_ORDI,
+        ONO TYPE ZDEONO_28,
+        OIN TYPE ZDEOITMNO_28,
+        ICOST TYPE ZDEOICOST_28,
+  END OF TS_ORDI.
+
+DATA : IT_ORDI TYPE TABLE OF TS_ORDI,
+       WA_ORDI TYPE TS_ORDI.
+
+AT LINE-SELECTION.
+  SELECT ONO OIN ICOST
+    FROM ZORDI_28
+    INTO TABLE IT_ORDI
+    WHERE ONO = SY-LISEL+0(10).
+
+    WRITE : /'ORDER NUMBER',
+            'ORDER ITEM NUMBER',
+            'ITEM COST'.
+    LOOP AT IT_ORDI INTO WA_ORDI.
+      WRITE : / WA_ORDI-ONO,
+                WA_ORDI-OIN,
+                WA_ORDI-ICOST.
+      ENDLOOP.
